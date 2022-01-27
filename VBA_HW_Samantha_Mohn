@@ -1,0 +1,85 @@
+Sub ticker():
+
+Dim total_volume As Double
+Dim summary_table_row As Integer
+Dim yearly_change As Double
+Dim percent_change As Double
+Dim open_price As Double
+Dim close_price As Double
+
+Total = 0
+summary_table_row = 2
+open_price = Cells(2, 3).Value
+open_price_index = 2
+
+Cells(1, 9).Value = "Ticker"
+Cells(1, 10).Value = "Yearly Change"
+Cells(1, 11).Value = "Percent Change"
+Cells(1, 12).Value = "Total Stock Volume"
+
+For i = 2 To 800000
+    If Cells(i, 1).Value = Cells(i + 1, 1).Value Then
+       total_volume = Cells(i, 7).Value + total_volume
+    
+    Else
+        If open_price = 0 Then
+            For j = open_price_index to i
+
+                If Cells(j,3).value <> 0 Then
+                    open_price = Cells(j,3).value
+                    Exit for
+                End if
+            Next j
+        Else
+            Exit for
+        End if
+        open_price_index = i + 1
+        close_price = Cells(i, 6).Value
+        yearly_change = (close_price - open_price)
+            If yearly_change > 0 Then
+                Cells(summary_table_row, 10).Interior.ColorIndex = 4
+            Else
+                Cells(summary_table_row, 10).Interior.ColorIndex = 3
+            End If
+        If open_price = 0 Then
+            percent_change = 0
+        Else
+            percent_change = (yearly_change / open_price)
+        End if
+
+        total_volume = Cells(i, 7).Value + total_volume
+        Cells(summary_table_row, 9).Value = Cells(i, 1).Value
+        Cells(summary_table_row, 10).Value = yearly_change
+        Cells(summary_table_row, 11).Value = percent_change
+        Cells(summary_table_row, 11).Value = FormatPercent(percent_change)
+        Cells(summary_table_row, 12).Value = total_volume
+        open_price = Cells(i + 1, 3).Value
+        total_volume = 0
+        summary_table_row = summary_table_row + 1
+    End If
+
+Next i
+
+Cells(2, 15).Value = "Greatest % Increase"
+Cells(3, 15).Value = "Greatest % Decrease"
+Cells(4, 15).Value = "Greatest Total Volume"
+Cells(1, 16).Value = "Ticker"
+Cells(1, 17).Value = "Value"
+
+For i = 2 To 800000
+    If Cells(i, 11).Value = Application.WorksheetFunction.Max(Range("K2:K70926")) Then
+        Cells(2, 16).Value = Cells(i, 9).Value
+        Cells(2, 17).Value = Cells(i, 11).Value
+        Cells(2, 17).Value = FormatPercent(Cells(i, 11).Value)
+    ElseIf Cells(i, 11).Value = Application.WorksheetFunction.Min(Range("K2:K70926")) Then
+        Cells(3, 16).Value = Cells(i, 9).Value
+        Cells(3, 17).Value = Cells(i, 11).Value
+        Cells(3, 17).Value = FormatPercent(Cells(i, 11).Value)
+    ElseIf Cells(i, 12).Value = Application.WorksheetFunction.Max(Range("L2:L70926")) Then
+        Cells(4, 16).Value = Cells(i, 9).Value
+        Cells(4, 17).Value = Cells(i, 12).Value
+    End If
+
+Next i
+
+End Sub
